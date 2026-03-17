@@ -1,0 +1,265 @@
+#   1. `mysql --version`
+
+##  Syntax
+
+```bash
+mysql --version
+```
+
+##  Explanation
+
+* `mysql` → Command-line tool for MySQL
+* `--version` → Shows the installed MySQL version
+
+   Used to check if MySQL is installed correctly.
+
+##  Example
+
+```bash
+mysql --version
+```
+
+##  Output (Example)
+
+```
+mysql  Ver 8.0.36 for Win64 on x86_64
+```
+
+---
+
+#   2. `mysql -u root -p`
+
+##  Syntax
+
+```bash
+mysql -u <username> -p
+```
+
+##  Explanation
+
+* `mysql` → Starts MySQL CLI
+* `-u root` → Login as user "root"
+* `-p` → Prompt for password
+
+   Used to connect to MySQL server.
+
+##  Example
+
+```bash
+mysql -u root -p
+```
+
+##  Output
+
+```
+Enter password: ****
+```
+
+---
+
+#   3. `SHOW DATABASES;`
+
+##  Syntax
+
+```sql
+SHOW DATABASES;
+```
+
+##  Explanation
+
+* `SHOW` → Display information
+* `DATABASES` → List all databases
+
+   Shows all available databases in MySQL.
+
+##  Example
+
+```sql
+SHOW DATABASES;
+```
+
+##  Output (Example)
+
+```
+information_schema
+mysql
+performance_schema
+sys
+```
+
+---
+
+#   4. `CREATE DATABASE social_db;`
+
+##  Syntax
+
+```sql
+CREATE DATABASE database_name;
+```
+
+##  Explanation
+
+* `CREATE DATABASE` → Creates a new database
+* `social_db` → Name of the database
+
+   Used to create a new database.
+
+##  Example
+
+```sql
+CREATE DATABASE social_db;
+```
+
+##  Output
+
+```
+Query OK, 1 row affected
+```
+
+---
+
+#   5. `USE social_db;`
+
+## Syntax
+
+```sql
+USE database_name;
+```
+
+## Explanation
+
+* `USE` → Selects a database
+* `social_db` → Database to work with
+
+After this, all queries will run inside this database.
+
+## Example
+
+```sql
+USE social_db;
+```
+
+## Output
+
+```
+Database changed
+```
+
+---
+
+# 6. `CREATE TABLE people (...);`
+
+##  Syntax
+
+```sql
+CREATE TABLE table_name (
+    column1 datatype,
+    column2 datatype 
+);
+```
+
+## Explanation
+
+* `CREATE TABLE` → Creates a new table
+* `people` → Table name
+* `column` → Field name
+* `datatype` → Type of data (INT, VARCHAR, etc.)
+
+   Defines structure of the table.
+
+## Example
+
+```sql
+CREATE TABLE people (
+    id INT,
+    name VARCHAR(50),
+    age INT,
+    city VARCHAR(50)
+);
+```
+
+## Output
+
+```
+Query OK, 0 rows affected
+```
+
+---
+
+# 7. `SHOW TABLES;`
+
+## Syntax
+
+```sql
+SHOW TABLES;
+```
+
+## Explanation
+
+* `SHOW` → Display
+* `TABLES` → Lists all tables in current database
+
+Works only after `USE database`.
+
+## Example
+
+```sql
+SHOW TABLES;
+```
+
+## Output
+
+```
+people
+```
+
+---
+
+# 8. `SHOW COLUMNS FROM people;`
+
+## Syntax
+
+```sql
+SHOW COLUMNS FROM table_name;
+```
+
+## Explanation
+
+* `SHOW COLUMNS` → Displays column details
+* `FROM people` → Table name
+
+Shows structure of table (columns, types, keys).
+
+## Example
+
+```sql
+SHOW COLUMNS FROM people;
+```
+
+
+---
+
+# 9. `DESCRIBE people;`
+
+##  Syntax
+
+```sql
+DESCRIBE table_name;
+```
+
+## Explanation
+
+* `DESCRIBE` → Shortcut for table structure
+* `people` → Table name
+
+Same as `SHOW COLUMNS`.
+
+##  Example
+
+```sql
+DESCRIBE people;
+```
+
+---
+
+
