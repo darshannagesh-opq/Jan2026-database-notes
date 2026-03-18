@@ -1,0 +1,291 @@
+1. **Numeric Data Types**
+    
+Integer Data Types
+| Data Type | Size    | Usage              |
+| --------- | ------- | ------------------ |
+| TINYINT   | 1 byte  | very small numbers | 0 -255 -> 2^8 -> -128 - 127
+| SMALLINT  | 2 bytes | small numbers      |
+| MEDIUMINT | 3 bytes | medium numbers     |
+| INT       | 4 bytes | most commonly used |
+| BIGINT    | 8 bytes | very large numbers |
+
+Floating Point Data Types
+| Data Type | Size    |
+| --------- | ------- |
+| FLOAT     | 4 bytes |
+| DOUBLE    | 8 bytes |
+
+Fixed Point Data Type
+DECIMAL(10, 2)
+
+2. **String Data Types** -> text data
+name, address, emails, city
+currency_code CHAR(3) -> INR, USD, A, B, Ab
+VARCHAR(10) -> Max chars 10
+| Data Type | Description          |
+| --------- | -------------------- |
+| CHAR      | fixed length text    | -> CHAR(n) -> 3 -> INR, USD, EUR
+| VARCHAR   | variable length text |VARCHAR(n) -> 3
+| TEXT      | large text data      | -> TINYTEXT 255, TEXT 64k, mediumtext 16MB, LONGTEXT 4gb
+
+3. **Binary Data Types**
+| Type      | Description            |
+| --------- | ---------------------- |
+| BINARY    | fixed length binary    | -> image 
+| VARBINARY | variable length binary |
+| BLOB      | binary large object    | 
+
+4. **Date and Time Data Types**
+| Data Type | Description                                |
+| --------- | ------------------------------------------ |
+| DATE      | stores date only   YYYY-MM-DD                        |
+| TIME      | stores time only   HH:MM:SS                        |
+| DATETIME  | stores date and time    YYYY-MM-DD  HH:MM:SS                 |
+| TIMESTAMP | stores date and time with timezone support | z
+
+5. **Boolean Data Type in SQL**
+Boolean_Value	Stored_As
+TRUE	         1
+FALSE	         0
+
+
+
+==============================
+
+## 1. Data Types in SQL
+
+### Syntax
+
+```sql
+CREATE TABLE table_name (
+    column1 INT,
+    column2 VARCHAR(50),
+    column3 DATE,
+    column4 DECIMAL(10,2)
+);
+```
+
+### Explanation
+
+* `CREATE TABLE` → Creates a new table
+* `column1 INT` → Stores integer values
+* `VARCHAR(50)` → Stores text up to 50 characters
+* `DATE` → Stores date values (YYYY-MM-DD)
+* `DECIMAL(10,2)` → Stores numbers with precision (total 10 digits, 2 after decimal)
+
+### Example
+
+```sql
+CREATE TABLE students (
+    id INT,
+    name VARCHAR(50),
+    dob DATE,
+    marks DECIMAL(5,2)
+);
+```
+
+### Output Explanation
+
+A table named `students` is created with 4 columns of different data types.
+
+---
+
+## 2. INSERT Statement
+
+### Syntax
+
+```sql
+INSERT INTO table_name (column1, column2, column3)
+VALUES (value1, value2, value3);
+```
+
+### Explanation
+
+* `INSERT INTO` → Adds new data into a table
+* `(column1, column2)` → Specifies columns to insert data into
+* `VALUES` → Actual data to be inserted
+
+### Example
+
+```sql
+INSERT INTO students (id, name, dob, marks)
+VALUES (1, 'Rahul', '2000-05-10', 85.50);
+```
+
+### Output Explanation
+
+A new row is added to the `students` table.
+
+---
+
+## 3. SELECT Statement
+
+### Syntax
+
+```sql
+SELECT column1, column2
+FROM table_name;
+```
+
+### Explanation
+
+* `SELECT` → Retrieves data from a table
+* `column1, column2` → Specifies which columns to fetch
+* `FROM` → Specifies the table
+
+### Example
+
+```sql
+SELECT id, name
+FROM students;
+```
+
+### Output Explanation
+
+Displays `id` and `name` of all students.
+
+---
+
+## 4. DISTINCT Keyword
+
+### Syntax
+
+```sql
+SELECT DISTINCT column_name
+FROM table_name;
+```
+
+### Explanation
+
+* `DISTINCT` → Removes duplicate values
+* Returns only unique values from the column
+
+### Example
+
+```sql
+SELECT DISTINCT marks
+FROM students;
+```
+
+### Output Explanation
+
+Shows unique marks without repetition.
+
+---
+
+## 5. WHERE Clause
+
+### Syntax
+
+```sql
+SELECT column1, column2
+FROM table_name
+WHERE condition;
+```
+
+### Explanation
+
+* `WHERE` → Filters rows based on a condition
+* `condition` → Can use operators like `=`, `>`, `<`, `AND`, `OR`
+
+### Example
+
+```sql
+SELECT name, marks
+FROM students
+WHERE marks > 80;
+```
+
+### Output Explanation
+
+Returns only students with marks greater than 80.
+
+---
+
+## 6. Constraints
+
+### a) NOT NULL
+
+#### Syntax
+
+```sql
+CREATE TABLE table_name (
+    column_name datatype NOT NULL
+);
+```
+
+#### Explanation
+
+* `NOT NULL` → Ensures the column cannot have empty (NULL) values
+
+#### Example
+
+```sql
+CREATE TABLE students (
+    id INT NOT NULL,
+    name VARCHAR(50) NOT NULL
+);
+```
+
+### Output Explanation
+
+Both `id` and `name` must always have values.
+
+---
+
+### b) UNIQUE
+
+#### Syntax
+
+```sql
+CREATE TABLE table_name (
+    column_name datatype UNIQUE
+);
+```
+
+#### Explanation
+
+* `UNIQUE` → Ensures all values in the column are different
+
+#### Example
+
+```sql
+CREATE TABLE users (
+    email VARCHAR(100) UNIQUE
+);
+```
+
+### Output Explanation
+
+No two users can have the same email.
+
+---
+
+### c) PRIMARY KEY
+
+#### Syntax
+
+```sql
+CREATE TABLE table_name (
+    column_name datatype PRIMARY KEY
+);
+```
+
+### Explanation
+
+* `PRIMARY KEY` → Uniquely identifies each row
+* Cannot have `NULL` values
+* Automatically enforces uniqueness
+
+### Example
+
+```sql
+CREATE TABLE students (
+    id INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+```
+
+### Output Explanation
+
+Each student must have a unique `id`, and it cannot be empty.
