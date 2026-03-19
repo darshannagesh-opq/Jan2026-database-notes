@@ -1,0 +1,193 @@
+#    DEFAULT Constraint
+
+##   Syntax
+
+```sql
+CREATE TABLE table_name (
+    column_name datatype DEFAULT default_value
+);
+```
+
+##    Explanation
+
+* `CREATE TABLE` → Creates a new table
+* `column_name` → Name of the column
+* `datatype` → Type of data (INT, VARCHAR, etc.)
+* `DEFAULT` → Sets a default value if no value is provided during insert
+
+##   Example
+
+```sql
+CREATE TABLE users (
+    id INT,
+    country VARCHAR(50) DEFAULT 'India'
+);
+```
+
+```sql
+INSERT INTO users (id) VALUES (1);
+```
+
+##  Output Explanation
+
+* Since `country` is not provided, it will automatically store `'India'`
+
+---
+
+#    AUTO_INCREMENT Constraint
+
+##   Syntax
+
+```sql
+CREATE TABLE table_name (
+    column_name INT AUTO_INCREMENT PRIMARY KEY
+);
+```
+
+##    Explanation
+
+* `AUTO_INCREMENT` → Automatically increases value (1, 2, 3...)
+* Usually used with `PRIMARY KEY`
+* No need to manually insert values
+
+##   Example
+
+```sql
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+INSERT INTO students (name) VALUES ('Rahul'), ('Anita');
+```
+
+##  Output Explanation
+
+| id | name  |
+| -- | ----- |
+| 1  | Rahul |
+| 2  | Anita |
+
+---
+
+#    Comparison Operators
+
+##   Syntax
+
+```sql
+SELECT column_name
+FROM table_name
+WHERE condition;
+```
+
+##    Operators & Meaning
+
+| Operator | Meaning                  |
+| -------- | ------------------------ |
+| =        | Equal to                 |
+| != / <>  | Not equal to             |
+| >        | Greater than             |
+| <        | Less than                |
+| >=       | Greater than or equal to |
+| <=       | Less than or equal to    |
+
+##   Example
+
+```sql
+SELECT name, age
+FROM students
+WHERE age > 18;
+```
+
+##  Output Explanation
+
+* Returns only students whose age is greater than 18
+
+---
+
+#    Logical Operators
+
+##   Syntax
+
+```sql
+SELECT column_name
+FROM table_name
+WHERE condition1 operator condition2;
+```
+
+##    Operators & Meaning
+
+| Operator | Meaning                             |
+| -------- | ----------------------------------- |
+| AND      | All conditions must be TRUE         |
+| OR       | At least one condition must be TRUE |
+| NOT      | Reverses a condition                |
+| XOR      | Only one condition must be TRUE     |
+
+---
+
+##   AND Operator
+
+###   Example
+
+```sql
+SELECT name
+FROM students
+WHERE age > 18 AND city = 'Bangalore';
+```
+
+###  Output
+
+* Returns students who satisfy **both conditions**
+
+---
+
+##   OR Operator
+
+###   Example
+
+```sql
+SELECT name
+FROM students
+WHERE city = 'Bangalore' OR city = 'Mumbai';
+```
+
+###  Output
+
+* Returns students from **either Bangalore or Mumbai**
+
+---
+
+##   NOT Operator
+
+###   Example
+
+```sql
+SELECT name
+FROM students
+WHERE NOT city = 'Delhi';
+```
+
+###  Output
+
+* Returns students **not from Delhi**
+
+---
+
+##   XOR Operator (MySQL)
+
+###   Example
+
+```sql
+SELECT name
+FROM students
+WHERE age > 18 XOR city = 'Bangalore';
+```
+
+###  Output Explanation
+
+* Returns rows where **only one condition is TRUE**
+* If both are TRUE or both FALSE → excluded
+
+---
+
