@@ -1,0 +1,376 @@
+# 1. BETWEEN
+
+## Syntax
+
+```sql
+SELECT column_name
+FROM table_name
+WHERE column_name BETWEEN value1 AND value2;
+```
+
+##  Explanation
+
+* `BETWEEN` → filters values within a range
+* `value1` → starting value (inclusive)
+* `value2` → ending value (inclusive)
+
+## Example
+
+```sql
+SELECT name, salary
+FROM employees
+WHERE salary BETWEEN 30000 AND 60000;
+```
+
+## Output
+
+Returns employees whose salary is **between 30k and 60k (inclusive)**.
+
+---
+
+# 2. IN
+
+## Syntax
+
+```sql
+SELECT column_name
+FROM table_name
+WHERE column_name IN (value1, value2, value3);
+```
+
+##  Explanation
+
+* `IN` → checks if a value matches **any value in the list**
+
+## Example
+
+```sql
+SELECT name, country
+FROM customers
+WHERE country IN ('India', 'USA', 'UK');
+```
+
+## Output
+
+Returns customers from **India, USA, or UK**.
+
+---
+
+# 3. LIKE
+
+## Syntax
+
+```sql
+SELECT column_name
+FROM table_name
+WHERE column_name LIKE pattern;
+```
+
+##  Explanation
+
+* `LIKE` → used for pattern matching
+* `%` → matches any number of characters
+* `_` → matches a single character
+
+## Example
+
+```sql
+SELECT name
+FROM employees
+WHERE name LIKE 'A%';
+```
+
+## Output
+
+Returns names **starting with 'A'**
+
+---
+
+# 4. IS NULL
+
+## Syntax
+
+```sql
+SELECT column_name
+FROM table_name
+WHERE column_name IS NULL;
+```
+
+##  Explanation
+
+* `IS NULL` → checks for **missing (NULL) values**
+
+## Example
+
+```sql
+SELECT name
+FROM employees
+WHERE manager_id IS NULL;
+```
+
+## Output
+
+Returns employees **without a manager**
+
+---
+
+# 5. IS NOT NULL
+
+## Syntax
+
+```sql
+SELECT column_name
+FROM table_name
+WHERE column_name IS NOT NULL;
+```
+
+##  Explanation
+
+* `IS NOT NULL` → checks for **non-null values**
+
+## Example
+
+```sql
+SELECT name
+FROM employees
+WHERE email IS NOT NULL;
+```
+
+## Output
+
+Returns employees **who have email values**
+
+---
+
+# STRING FUNCTIONS
+
+---
+
+# 6. CONCAT
+
+## Syntax
+
+```sql
+SELECT CONCAT(string1, string2, ...);
+```
+
+##  Explanation
+
+* Combines multiple strings into one
+
+## Example
+
+```sql
+SELECT CONCAT(first_name, ' ', last_name) AS full_name
+FROM employees;
+```
+
+---
+
+# 7. CONCAT_WS (With Separator)
+
+## Syntax
+
+```sql
+SELECT CONCAT_WS(separator, string1, string2, ...);
+```
+
+##  Explanation
+
+* Combines strings using a **separator**
+* Automatically skips NULL values
+
+## Example
+
+```sql
+SELECT CONCAT_WS('-', '2026', '03', '20') AS formatted_date;
+```
+
+---
+
+# 8. SUBSTRING
+
+## Syntax
+
+```sql
+SELECT SUBSTRING(string, start_position, length);
+```
+
+##  Explanation
+
+* Extracts part of a string
+* `start_position` → starting index (1-based)
+* `length` → number of characters
+
+## Example
+
+```sql
+SELECT SUBSTRING('Database', 1, 4);
+```
+
+## Output
+
+`Data`
+
+---
+
+# 9. INSTR
+
+## Syntax
+
+```sql
+SELECT INSTR(string, substring);
+```
+
+##  Explanation
+
+* Returns position of first occurrence of substring
+
+## Example
+
+```sql
+SELECT INSTR('MySQL Database', 'SQL');
+```
+
+## Output
+
+`3`
+
+---
+
+# 10. LOCATE
+
+## Syntax
+
+```sql
+SELECT LOCATE(substring, string);
+```
+
+##  Explanation
+
+* Similar to `INSTR`
+* Finds position of substring
+
+## Example
+
+```sql
+SELECT LOCATE('base', 'Database');
+```
+
+## Output
+
+`5`
+
+---
+
+# 11. REPLACE
+
+## Syntax
+
+```sql
+SELECT REPLACE(string, old_value, new_value);
+```
+
+##  Explanation
+
+* Replaces part of a string
+
+## Example
+
+```sql
+SELECT REPLACE('Hello World', 'World', 'SQL');
+```
+
+## Output
+
+`Hello SQL`
+
+---
+
+# 12. LENGTH
+
+## Syntax
+
+```sql
+SELECT LENGTH(string);
+```
+
+##  Explanation
+
+* Returns length in **bytes**
+
+## Example
+
+```sql
+SELECT LENGTH('Hello');
+```
+
+## Output
+
+`5`
+
+---
+
+# 13. CHARACTER_LENGTH
+
+## Syntax
+
+```sql
+SELECT CHARACTER_LENGTH(string);
+```
+
+##  Explanation
+
+* Returns number of **characters**
+* Better for multi-byte characters
+
+## Example
+
+```sql
+SELECT CHARACTER_LENGTH('Hello');
+```
+
+---
+
+# 14. LEFT
+
+## Syntax
+
+```sql
+SELECT LEFT(string, number_of_characters);
+```
+
+##  Explanation
+
+* Extracts characters from **left side**
+
+## Example
+
+```sql
+SELECT LEFT('Database', 4);
+```
+
+## Output
+
+`Data`
+
+---
+
+# 15. RIGHT
+
+## Syntax
+
+```sql
+SELECT RIGHT(string, number_of_characters);
+```
+
+##  Explanation
+
+* Extracts characters from **right side**
+
+## Example
+
+```sql
+SELECT RIGHT('Database', 4);
+```
+
