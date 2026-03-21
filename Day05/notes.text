@@ -1,0 +1,500 @@
+# 1. Arithmetic Operators in MySQL
+
+## Definition
+
+Arithmetic operators are used to perform mathematical calculations on numeric values.
+
+---
+
+##Common Operators
+
+| Operator | Meaning             |
+| -------- | ------------------- |
+| `+`      | Addition            |
+| `-`      | Subtraction         |
+| `*`      | Multiplication      |
+| `/`      | Division            |
+| `%`      | Modulus (remainder) |
+
+---
+
+## Syntax
+
+```sql
+SELECT column1 + column2 AS result FROM table_name;
+```
+
+---
+
+##  Explanation
+
+* `SELECT` → Fetch data
+* `column1 + column2` → Perform operation
+* `AS` → Rename output column
+* `FROM` → Specify table
+
+---
+
+## Example
+
+```sql
+SELECT price, quantity, price * quantity AS total_cost
+FROM products;
+```
+
+### Sample Table: products
+
+| price | quantity |
+| ----- | -------- |
+| 100   | 2        |
+| 50    | 3        |
+
+### Output
+
+| price | quantity | total_cost |
+| ----- | -------- | ---------- |
+| 100   | 2        | 200        |
+| 50    | 3        | 150        |
+
+---
+
+## More Examples
+
+```sql
+SELECT 10 + 5;   -- 15
+SELECT 10 - 5;   -- 5
+SELECT 10 * 5;   -- 50
+SELECT 10 / 5;   -- 2
+SELECT 10 % 3;   -- 1
+```
+
+---
+
+# 2. Modifying Tables in MySQL
+
+## Definition
+
+Modifying tables means changing the structure of an existing table.
+
+---
+
+## 🔧 2.1 Add Column
+
+### Syntax
+
+```sql
+ALTER TABLE table_name
+ADD column_name datatype;
+```
+
+### Example
+
+```sql
+ALTER TABLE students
+ADD age INT;
+```
+
+---
+
+## 2.2 Modify Column
+
+### Syntax
+
+```sql
+ALTER TABLE table_name
+MODIFY column_name new_datatype;
+```
+
+### Example
+
+```sql
+ALTER TABLE students
+MODIFY age BIGINT;
+```
+
+---
+
+## 2.3 Rename Column
+
+### Syntax
+
+```sql
+ALTER TABLE table_name
+CHANGE old_column_name new_column_name datatype;
+```
+
+### Example
+
+```sql
+ALTER TABLE students
+CHANGE age student_age INT;
+```
+
+---
+
+## 2.4 Drop Column
+
+### Syntax
+
+```sql
+ALTER TABLE table_name
+DROP COLUMN column_name;
+```
+
+### Example
+
+```sql
+ALTER TABLE students
+DROP COLUMN student_age;
+```
+
+---
+
+## 2.5 Add Constraints
+
+### Primary Key
+
+```sql
+ALTER TABLE students
+ADD PRIMARY KEY (id);
+```
+
+
+---
+
+## 2.6 Drop Constraints
+
+### Drop Primary Key
+
+```sql
+ALTER TABLE students
+DROP PRIMARY KEY;
+```
+
+### Drop Foreign Key
+
+```sql
+ALTER TABLE orders
+DROP FOREIGN KEY fk_customer;
+```
+
+---
+
+**Important Tip:**
+If a column has `AUTO_INCREMENT`, it must be a **PRIMARY KEY or UNIQUE** → otherwise you’ll get errors like:
+
+```
+Incorrect table definition; there can be only one auto column and it must be defined as a key
+```
+
+---
+
+# 3. CRUD Operations in MySQL
+
+CRUD = **Create, Read, Update, Delete**
+
+---
+
+## 3.1 CREATE (Insert Data)
+
+### Syntax
+
+```sql
+INSERT INTO table_name (column1, column2)
+VALUES (value1, value2);
+```
+
+### Example
+
+```sql
+INSERT INTO students (id, name, age)
+VALUES (1, 'Darshan', 22);
+```
+
+---
+
+## 3.2 READ (Select Data)
+
+### Syntax
+
+```sql
+SELECT column1, column2
+FROM table_name
+WHERE condition;
+```
+
+### Example
+
+```sql
+SELECT * FROM students;
+```
+
+```sql
+SELECT name FROM students WHERE age > 20;
+```
+---
+
+# SELECT with ORDER BY & LIMIT in MySQL
+
+---
+
+## 1. ORDER BY Clause
+
+### Definition
+
+`ORDER BY` is used to **sort the result set** in ascending or descending order.
+
+---
+
+## Syntax
+
+```sql
+SELECT column1, column2
+FROM table_name
+ORDER BY column_name ASC|DESC;
+```
+
+---
+
+## Explanation
+
+* `ORDER BY` → Sorts the output
+* `ASC` → Ascending order (default)
+* `DESC` → Descending order
+
+---
+
+## Example
+
+```sql
+SELECT name, age
+FROM students
+ORDER BY age ASC;
+```
+
+### Output (Sorted by age)
+
+| name    | age |
+| ------- | --- |
+| Ravi    | 18  |
+| Amit    | 20  |
+| Darshan | 22  |
+
+---
+
+###  Descending Example
+
+```sql
+SELECT name, age
+FROM students
+ORDER BY age DESC;
+```
+
+---
+
+##  Multiple Column Sorting
+
+```sql
+SELECT name, age, marks
+FROM students
+ORDER BY marks DESC, age ASC;
+```
+
+ First sorted by `marks`, then by `age`
+
+---
+
+# 2. LIMIT Clause
+
+### Definition
+
+`LIMIT` is used to **restrict the number of rows returned**.
+
+---
+
+## Syntax
+
+```sql
+SELECT column1
+FROM table_name
+LIMIT number;
+```
+
+---
+
+##  Example
+
+```sql
+SELECT * FROM students
+LIMIT 3;
+```
+
+Returns only **first 3 rows**
+
+---
+
+##  LIMIT with OFFSET
+
+### Syntax
+
+```sql
+SELECT column1
+FROM table_name
+LIMIT offset, count;
+```
+
+---
+
+## Example
+
+```sql
+SELECT * FROM students
+LIMIT 2, 3;
+```
+
+Skip first 2 rows, then return next 3 rows
+
+---
+
+# 3. ORDER BY + LIMIT (Very Important)
+
+Used for **Top N results (very common in interviews)**
+
+---
+
+## Syntax
+
+```sql
+SELECT column1
+FROM table_name
+ORDER BY column_name DESC
+LIMIT number;
+```
+
+---
+
+## Example (Top 3 highest marks)
+
+```sql
+SELECT name, marks
+FROM students
+ORDER BY marks DESC
+LIMIT 3;
+```
+
+### Output
+
+| name | marks |
+| ---- | ----- |
+| A    | 95    |
+| B    | 90    |
+| C    | 88    |
+
+---
+
+## Example (Lowest 2 values)
+
+```sql
+SELECT name, marks
+FROM students
+ORDER BY marks ASC
+LIMIT 2;
+```
+
+---
+
+# Real-World Use Cases
+
+* Top 10 students → `ORDER BY marks DESC LIMIT 10`
+* Latest orders → `ORDER BY created_at DESC LIMIT 5`
+* Pagination → `LIMIT offset, count`
+
+---
+
+#  Summary
+
+* `ORDER BY` → Sort results
+* `LIMIT` → Restrict number of rows
+* Combined → Powerful for **ranking & pagination**
+
+---
+
+
+---
+
+##  3.3 UPDATE (Modify Data)
+
+### Syntax
+
+```sql
+UPDATE table_name
+SET column1 = value1
+WHERE condition;
+```
+
+### Example
+
+```sql
+UPDATE students
+SET age = 23
+WHERE id = 1;
+```
+
+Without `WHERE`, all rows will be updated!
+
+---
+
+## 3.4 DELETE (Remove Data)
+
+### Syntax
+
+```sql
+DELETE FROM table_name
+WHERE condition;
+```
+
+### Example
+
+```sql
+DELETE FROM students
+WHERE id = 1;
+```
+
+---
+
+## Important Difference
+
+| Command    | Action                  |
+| ---------- | ----------------------- |
+| `DELETE`   | Removes specific rows   |
+| `DROP`     | Deletes entire table    |
+
+---
+
+## Example Flow (CRUD Together)
+
+```sql
+-- Create
+INSERT INTO students VALUES (1, 'Amit', 20);
+
+-- Read
+SELECT * FROM students;
+
+-- Update
+UPDATE students SET age = 21 WHERE id = 1;
+
+-- Delete
+DELETE FROM students WHERE id = 1;
+```
+
+---
+
+# Summary
+
+* Arithmetic operators → Perform calculations
+* ALTER TABLE → Modify structure
+* CRUD → Manage data inside tables
+
+---
+
+
