@@ -435,8 +435,6 @@ CREATE TABLE posts (
 
 ---
 
-If you want, I can next explain **difference between DATETIME vs TIMESTAMP in real production systems (very important for interviews)** 🚀
-
 
 ## Important Difference
 
