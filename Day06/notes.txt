@@ -1,0 +1,464 @@
+# 1. Aggregate Functions
+
+##  Definition
+
+Aggregate functions perform calculations on multiple rows and return a **single value**.
+
+##  Common Functions
+
+* `COUNT()` → counts rows
+* `SUM()` → adds values
+* `AVG()` → average
+* `MIN()` → smallest value
+* `MAX()` → largest value
+
+---
+
+##  Syntax
+
+```sql
+SELECT AGGREGATE_FUNCTION(column_name)
+FROM table_name;
+```
+
+---
+
+##  Syntax Explanation
+
+* `SELECT` → choose what to display
+* `AGGREGATE_FUNCTION()` → operation like SUM, COUNT
+* `column_name` → column to apply function
+* `FROM` → table source
+
+---
+
+##  Example
+
+```sql
+SELECT AVG(salary)
+FROM employees;
+```
+
+### Sample Table: employees
+
+| id | name | salary |
+| -- | ---- | ------ |
+| 1  | A    | 10000  |
+| 2  | B    | 20000  |
+| 3  | C    | 30000  |
+
+---
+
+##  Output Explanation
+
+Average = (10000 + 20000 + 30000) / 3 = **20000**
+
+---
+
+# 2. GROUP BY
+
+##  Definition
+
+`GROUP BY` groups rows that have the same values into **summary groups**.
+
+---
+
+##  Syntax
+
+```sql
+SELECT column_name, AGGREGATE_FUNCTION(column_name)
+FROM table_name
+GROUP BY column_name;
+```
+
+---
+
+##  Syntax Explanation
+
+* `GROUP BY` → groups rows based on column values
+* Aggregate functions are applied **per group**
+
+---
+
+##  Example
+
+```sql
+SELECT department, AVG(salary)
+FROM employees
+GROUP BY department;
+```
+
+### Sample Table
+
+| name | department | salary |
+| ---- | ---------- | ------ |
+| A    | HR         | 10000  |
+| B    | IT         | 20000  |
+| C    | HR         | 15000  |
+
+---
+
+##  Output Explanation
+
+| department | avg_salary |
+| ---------- | ---------- |
+| HR         | 12500      |
+| IT         | 20000      |
+
+ HR has 2 employees → average calculated separately
+
+---
+
+# 3. HAVING
+
+##  Definition
+
+`HAVING` is used to filter **grouped data** (after `GROUP BY`).
+
+ Think:
+
+* `WHERE` → filters rows
+* `HAVING` → filters groups
+
+---
+
+##  Syntax
+
+```sql
+SELECT column_name, AGGREGATE_FUNCTION(column_name)
+FROM table_name
+GROUP BY column_name
+HAVING condition;
+```
+
+---
+
+##  Syntax Explanation
+
+* `HAVING` → applies condition on aggregated results
+* Used **after grouping**
+
+---
+
+##  Example
+
+```sql
+SELECT department, AVG(salary)
+FROM employees
+GROUP BY department
+HAVING AVG(salary) > 15000;
+```
+
+---
+
+##  Output Explanation
+
+| department |
+| ---------- |
+| IT         |
+
+ Only IT satisfies average salary > 15000
+
+---
+
+##  Common Mistake
+
+ Using aggregate in WHERE:
+
+```sql
+WHERE AVG(salary) > 15000  --  Wrong
+```
+
+Correct:
+
+```sql
+HAVING AVG(salary) > 15000
+```
+
+---
+
+#  4. DATE Data Type
+
+##  Definition
+
+Stores **only date** in format:
+ `YYYY-MM-DD`
+
+---
+
+##  Syntax
+
+```sql
+CREATE TABLE users (
+    id INT,
+    birth_date DATE
+);
+```
+
+---
+
+##  Example
+
+```sql
+INSERT INTO users (id, birth_date)
+VALUES (1, '2000-05-10');
+```
+
+---
+
+##  Output Explanation
+
+Stored as:
+
+```
+2000-05-10
+```
+
+ No time included
+
+---
+
+#  5. DATETIME Data Type
+
+##  Definition
+
+Stores **date + time**
+
+ Format: `YYYY-MM-DD HH:MM:SS`
+
+---
+
+##  Syntax
+
+```sql
+CREATE TABLE orders (
+    id INT,
+    order_time DATETIME
+);
+```
+
+---
+
+##  Example
+
+```sql
+INSERT INTO orders (id, order_time)
+VALUES (1, '2026-03-22 14:30:00');
+```
+
+---
+
+##  Output Explanation
+
+Stored exactly as inserted:
+
+```
+2026-03-22 14:30:00
+```
+
+ No automatic timezone conversion
+
+---
+
+#  6. TIMESTAMP Data Type
+
+##  Definition
+
+Stores date + time and is **automatically managed** (can auto-update).
+
+ Often used for:
+
+* login time
+* created_at
+* updated_at
+
+---
+
+##  Syntax
+
+```sql
+CREATE TABLE user_logins (
+    id INT,
+    login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+##  Syntax Explanation
+
+* `TIMESTAMP` → date + time
+* `DEFAULT CURRENT_TIMESTAMP` → auto insert current time
+
+---
+
+##  Example
+
+```sql
+INSERT INTO user_logins (id)
+VALUES (1);
+```
+
+---
+
+##  Output Explanation
+
+```
+login_time = current system timestamp
+```
+
+ MySQL stores it in **UTC internally** and converts to your system timezone when fetching.
+
+---
+
+
+# TIMESTAMP with ON UPDATE CURRENT_TIMESTAMP
+
+## Definition
+
+`ON UPDATE CURRENT_TIMESTAMP` automatically updates the column value **whenever a row is modified**.
+
+Used for tracking:
+
+* last updated time
+* modified_at
+
+---
+
+## Syntax
+
+```sql
+CREATE TABLE table_name (
+    column_name TIMESTAMP 
+    DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+---
+
+##  Syntax Explanation
+
+* `TIMESTAMP` → stores date and time
+* `DEFAULT CURRENT_TIMESTAMP` → sets current time during INSERT
+* `ON UPDATE CURRENT_TIMESTAMP` → updates time automatically during UPDATE
+
+---
+
+##  Example
+
+```sql
+CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    updated_at TIMESTAMP 
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## Insert Example
+
+```sql
+INSERT INTO users (id, name)
+VALUES (1, 'Darshan');
+```
+
+### Output (After Insert)
+
+| id | name    | updated_at          |
+| -- | ------- | ------------------- |
+| 1  | Darshan | 2026-03-22 10:00:00 |
+
+`updated_at` is set automatically
+
+---
+
+## Update Example
+
+```sql
+UPDATE users
+SET name = 'Darshan N'
+WHERE id = 1;
+```
+
+---
+
+## Output (After Update)
+
+| id | name      | updated_at          |
+| -- | --------- | ------------------- |
+| 1  | Darshan N | 2026-03-22 10:05:00 |
+
+`updated_at` automatically changes to current time
+
+---
+
+## Important Notes
+
+### 1. Works only when row is updated
+
+If no change happens → timestamp won’t update
+
+---
+
+### 2. Only applies to that column
+
+You can have multiple timestamp columns:
+
+```sql
+CREATE TABLE posts (
+    id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP 
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+---
+
+### 3. Real-world usage
+
+* `created_at` → when record created
+* `updated_at` → last modified time
+
+---
+
+## Quick Practice
+
+1. Create a table with both `created_at` and `updated_at`
+2. Insert a row and observe timestamps
+3. Update the row and check which column changes
+
+---
+
+If you want, I can next explain **difference between DATETIME vs TIMESTAMP in real production systems (very important for interviews)** 🚀
+
+
+## Important Difference
+
+| Feature     | DATE | DATETIME | TIMESTAMP |
+| ----------- | ---- | -------- | --------- |
+| Stores date | Yes  | Yes      | Yes       |
+| Stores time | No   | Yes      | Yes       |
+| Auto update | No   | No       | Yes       |
+| Timezone    | No   | No       | Yes       |
+
+---
+
+| Format | Description                  | Example     |
+| ------ | ---------------------------- | ----------- |
+| `%H`   | Hour (00–23, 24-hour format) | 14          |
+| `%h`   | Hour (01–12, 12-hour format) | 02          |
+| `%I`   | Hour (01–12, 12-hour format) | 02          |
+| `%k`   | Hour (0–23, no leading zero) | 4           |
+| `%l`   | Hour (1–12, no leading zero) | 4           |
+| `%i`   | Minutes (00–59)              | 30          |
+| `%s`   | Seconds (00–59)              | 45          |
+| `%S`   | Seconds (00–59)              | 45          |
+| `%p`   | AM or PM                     | PM          |
+| `%r`   | Time (hh:mm:ss AM/PM)        | 02:30:45 PM |
+| `%T`   | Time (24-hour hh:mm:ss)      | 14:30:45    |
