@@ -1,0 +1,316 @@
+# 1. FOREIGN KEY
+
+## Definition
+
+A **Foreign Key** is a column (or set of columns) in one table that refers to the **Primary Key** in another table.
+
+It is used to **maintain relationships and ensure data integrity** between tables.
+
+---
+
+## Explanation
+
+* Prevents invalid data insertion
+* Ensures that values exist in the parent table
+* Maintains consistency between related tables
+
+---
+
+## Syntax
+
+```sql
+CREATE TABLE child_table (
+    column_name datatype,
+    FOREIGN KEY (column_name)
+    REFERENCES parent_table(parent_column)
+    ON DELETE action
+    ON UPDATE action
+);
+```
+
+---
+
+## Syntax Explanation
+
+* `FOREIGN KEY (column_name)` → Column in child table
+* `REFERENCES parent_table(parent_column)` → Links to parent table
+* `ON DELETE` → What happens when parent row is deleted
+* `ON UPDATE` → What happens when parent value changes
+
+Common actions:
+
+* `CASCADE` → Apply same action
+* `SET NULL` → Set value to NULL
+* `RESTRICT` → Prevent action
+
+---
+
+## Example
+
+```sql
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    FOREIGN KEY (customer_id)
+    REFERENCES customers(customer_id)
+    ON DELETE SET NULL
+);
+```
+
+---
+
+## Output Explanation
+
+* You **cannot insert** an order with a `customer_id` that doesn’t exist
+* If a customer is deleted → `customer_id` in orders becomes `NULL`
+
+---
+
+# 2. RELATIONSHIPS IN SQL
+
+## Definition
+
+A **relationship** defines how tables are connected to each other using keys.
+
+---
+
+## Types of Relationships
+
+### 1. One-to-One (1:1)
+
+* One record in Table A → One record in Table B
+
+### 2. One-to-Many (1:N)
+
+* One record in Table A → Many records in Table B
+* Most common relationship
+
+### 3. Many-to-Many (M:N)
+
+* Many records in A ↔ Many in B
+* Requires a **junction table**
+
+---
+
+## Explanation
+
+Relationships are created using:
+
+* Primary Key
+* Foreign Key
+
+---
+
+## Syntax (General Idea)
+
+```sql
+-- One-to-Many Example
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    FOREIGN KEY (customer_id)
+    REFERENCES customers(customer_id)
+);
+```
+
+---
+
+## Example (One-to-Many)
+
+```sql
+-- Customers Table
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+-- Orders Table
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    FOREIGN KEY (customer_id)
+    REFERENCES customers(customer_id)
+);
+```
+
+---
+
+## Output Explanation
+
+* One customer can have multiple orders
+* Each order belongs to one customer
+
+---
+
+## Example (Many-to-Many)
+
+```sql
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+CREATE TABLE courses (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50)
+);
+
+CREATE TABLE student_courses (
+    student_id INT,
+    course_id INT,
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+```
+
+---
+
+## Output Explanation
+
+* One student can enroll in multiple courses
+* One course can have multiple students
+
+---
+
+# 3. DDL vs DML (THEORY + PRACTICAL)
+
+## Definition
+
+### DDL (Data Definition Language)
+
+Used to **define or modify database structure**
+
+### DML (Data Manipulation Language)
+
+Used to **work with data inside tables**
+
+---
+
+## Explanation
+
+### DDL → Structure
+
+* Create tables
+* Modify tables
+* Delete tables
+
+### DML → Data
+
+* Insert data
+* Update data
+* Delete data
+
+---
+
+## DDL Commands
+
+### Syntax
+
+```sql
+CREATE TABLE table_name (
+    column_name datatype
+);
+
+ALTER TABLE table_name
+ADD column_name datatype;
+
+DROP TABLE table_name;
+```
+
+---
+
+## Syntax Explanation
+
+* `CREATE` → Creates table
+* `ALTER` → Modifies structure
+* `DROP` → Deletes table completely
+
+---
+
+## Example
+
+```sql
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+ALTER TABLE employees
+ADD salary INT;
+```
+
+---
+
+## Output Explanation
+
+* Table `employees` created
+* New column `salary` added
+
+---
+
+## DML Commands
+
+### Syntax
+
+```sql
+INSERT INTO table_name (column1, column2)
+VALUES (value1, value2);
+
+UPDATE table_name
+SET column = value
+WHERE condition;
+
+DELETE FROM table_name
+WHERE condition;
+```
+
+---
+
+## Syntax Explanation
+
+* `INSERT` → Add new data
+* `UPDATE` → Modify existing data
+* `DELETE` → Remove data
+
+---
+
+## Example
+
+```sql
+INSERT INTO employees (emp_id, name, salary)
+VALUES (1, 'Darshan', 50000);
+
+UPDATE employees
+SET salary = 60000
+WHERE emp_id = 1;
+
+DELETE FROM employees
+WHERE emp_id = 1;
+```
+
+---
+
+## Output Explanation
+
+* Row inserted
+* Salary updated
+* Row deleted
+
+---
+
+#  Quick Interview Summary
+
+| Concept       | Key Idea                              |
+| ------------- | ------------------------------------- |
+| Foreign Key   | Maintains relationship between tables |
+| Relationships | Defines how tables are connected      |
+| DDL           | Works on structure                    |
+| DML           | Works on data                         |
+
+---
+
