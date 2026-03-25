@@ -1,0 +1,342 @@
+# 1. SQL JOINS
+
+##  Definition & Explanation
+
+Joins are used to **combine data from multiple tables** based on a related column (usually a foreign key).
+
+---
+
+## Types of Joins Covered
+
+* INNER JOIN
+* LEFT JOIN
+* RIGHT JOIN
+* FULL JOIN
+* CROSS JOIN
+
+---
+
+##  Syntax
+
+```sql
+SELECT column_names
+FROM table1
+JOIN_TYPE table2
+ON table1.common_column = table2.common_column;
+```
+
+---
+
+##  Syntax Explanation
+
+* `SELECT` → columns you want to see
+* `FROM` → first table
+* `JOIN_TYPE` → type of join (INNER, LEFT, etc.)
+* `ON` → condition to match rows
+
+---
+
+##  Sample Tables
+
+**customers**
+
+| customer_id | name |
+| ----------- | ---- |
+| 1           | A    |
+| 2           | B    |
+| 3           | C    |
+
+**orders**
+
+| order_id | customer_id |
+| -------- | ----------- |
+| 101      | 1           |
+| 102      | 2           |
+| 103      | 4           |
+
+---
+
+## 1. INNER JOIN
+
+### Definition
+
+Returns **only matching records** from both tables.
+
+```sql
+SELECT c.name, o.order_id
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+### Output Explanation
+
+* Only customer_id **1 and 2 match**
+* Customer 3 and order with customer_id 4 are ignored
+
+---
+
+## 2. LEFT JOIN
+
+### Definition
+
+Returns **all records from left table** + matching from right
+
+```sql
+SELECT c.name, o.order_id
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+### Output Explanation
+
+* All customers shown
+* Customer 3 → `order_id = NULL`
+
+---
+
+## 3. RIGHT JOIN
+
+### Definition
+
+Returns **all records from right table** + matching from left
+
+```sql
+SELECT c.name, o.order_id
+FROM customers c
+RIGHT JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+### Output Explanation
+
+* All orders shown
+* order with customer_id 4 → `name = NULL`
+
+---
+
+## 4. FULL JOIN
+
+### Definition
+
+Returns **all records from both tables**
+
+```sql
+SELECT c.name, o.order_id
+FROM customers c
+FULL JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+### Note
+
+* Not supported directly in MySQL
+* Use `UNION` workaround
+
+```sql
+SELECT c.name, o.order_id
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+
+UNION
+
+SELECT c.name, o.order_id
+FROM customers c
+RIGHT JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+### Output Explanation
+
+* Includes all matching + non-matching rows from both tables
+
+---
+
+## 5. CROSS JOIN
+
+### Definition
+
+Returns **all possible combinations** (Cartesian product)
+
+```sql
+SELECT c.name, o.order_id
+FROM customers c
+CROSS JOIN orders o;
+```
+
+### Output Explanation
+
+* If 3 customers × 3 orders → **9 rows**
+
+---
+
+## Common Mistakes
+
+* Forgetting `ON` condition → wrong results
+* Using wrong join type
+* Assuming FULL JOIN works in MySQL
+
+---
+
+# 2. SQL VIEWS
+
+##  Definition & Explanation
+
+A View is a **virtual table** created from a query.
+It does **not store data**, it stores the query.
+
+---
+
+##  Syntax
+
+```sql
+CREATE VIEW view_name AS
+SELECT column_names
+FROM table
+WHERE condition;
+```
+
+---
+
+##  Syntax Explanation
+
+* `CREATE VIEW` → creates virtual table
+* `view_name` → name of the view
+* `AS` → defines query
+* `SELECT` → data to show
+
+---
+
+##  Example
+
+```sql
+CREATE VIEW customer_orders AS
+SELECT c.name, o.order_id
+FROM customers c
+JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+##  Using View
+
+```sql
+SELECT * FROM customer_orders;
+```
+
+---
+
+## Output Explanation
+
+* Shows joined data like a table
+* No data duplication
+
+---
+
+##  Updating View
+
+```sql
+CREATE OR REPLACE VIEW customer_orders AS
+SELECT name FROM customers;
+```
+
+---
+
+##  Deleting View
+
+```sql
+DROP VIEW customer_orders;
+```
+
+---
+
+## Important Notes
+
+* View doesn’t store data
+* Changes in base tables reflect in view
+* Complex views may not allow updates
+
+---
+
+# 3. TRUNCATE
+
+##  Definition & Explanation
+
+`TRUNCATE` is used to **delete all rows from a table quickly**.
+
+* Faster than DELETE
+* Resets AUTO_INCREMENT
+* Cannot be rolled back (in most cases)
+
+---
+
+##  Syntax
+
+```sql
+TRUNCATE TABLE table_name;
+```
+
+---
+
+##  Syntax Explanation
+
+* `TRUNCATE` → remove all data
+* `TABLE` → specifies table
+* `table_name` → table to clear
+
+---
+
+##  Example
+
+```sql
+TRUNCATE TABLE orders;
+```
+
+---
+
+## Output Explanation
+
+* All rows deleted
+* Table structure remains
+* Auto-increment reset to 1
+
+---
+
+## Important Points
+
+* No `WHERE` condition allowed
+* Very fast (does not log row-by-row deletion)
+* Cannot be used if table is referenced by foreign key (in some cases)
+
+---
+
+## Common Mistakes
+
+* Trying to use `WHERE` → not allowed
+* Expecting rollback → usually not possible
+* Confusing with DELETE
+
+---
+
+# FINAL COMPARISON (Quick Revision)
+
+| Feature          | DELETE | TRUNCATE  | DROP    |
+| ---------------- | ------ | --------- | ------- |
+| Type             | DML    | DDL       | DDL     |
+| Delete specific  | Yes  | No      | No    |
+| Delete all rows  | Yes  | Yes     | Yes   |
+| Remove structure | No   | No      | Yes   |
+| WHERE            | Yes  | No      | No    |
+| Speed            | Slow   | Very Fast | Instant |
+| Rollback         | Yes  | No      | No    |
+| Auto Increment   | No   | Reset   | N/A     |
+| Triggers         | Yes  | No      | No    |
+
+
+
+---
+
+
