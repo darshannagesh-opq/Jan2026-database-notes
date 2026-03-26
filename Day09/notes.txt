@@ -1,0 +1,403 @@
+
+# SQL Notes: CTE (Common Table Expression) + CASE + Window Functions + ORDER BY + FRAMING
+---
+1. CTE (Common Table Expression)
+Definition
+
+A CTE (Common Table Expression) is a temporary result set that you can reference within a query. 
+It improves readability and helps break complex queries into steps.
+
+Syntax
+WITH cte_name AS (
+    SELECT column1, column2
+    FROM table_name
+    WHERE condition
+)
+SELECT *
+FROM cte_name;
+
+Syntax Explanation
+WITH → Starts the CTE
+cte_name → Temporary table name
+AS (...) → Defines the query inside CTE
+Outer SELECT → Uses the CTE like a table
+
+
+Example
+WITH high_salary AS (
+    SELECT name, salary
+    FROM employees
+    WHERE salary > 50000
+)
+
+SELECT *
+FROM high_salary;
+Output Explanation
+Returns only employees with salary > 50,000
+Acts like a temporary filtered table
+
+
+#  2. CASE Statement (Types)
+
+## Definition
+
+Used to apply **conditional logic (IF-ELSE)** inside SQL queries.
+
+---
+
+## 1. Simple CASE
+
+### Explanation
+
+Compares a column with fixed values.
+
+```sql
+SELECT name, department,
+       CASE department
+           WHEN 'IT' THEN 'Tech'
+           WHEN 'HR' THEN 'Non-Tech'
+           ELSE 'Other'
+       END AS dept_type
+FROM employees;
+```
+
+---
+
+## 2. Searched CASE (Most Used)
+
+### Explanation
+
+Uses conditions (flexible).
+
+```sql
+SELECT name, salary,
+       CASE
+           WHEN salary > 70000 THEN 'High'
+           WHEN salary >= 40000 THEN 'Medium'
+           ELSE 'Low'
+       END AS category
+FROM employees;
+```
+
+---
+
+#  3. Window Functions
+
+## Definition
+
+Perform calculations across rows **without collapsing rows (no GROUP BY)**.
+
+---
+
+## General Syntax
+
+```sql
+SELECT column,
+       function() OVER (
+           PARTITION BY column
+           ORDER BY column
+       ) AS alias
+FROM table_name;
+```
+
+---
+
+#  2.1 Ranking Functions
+
+## ROW_NUMBER()
+
+```sql
+ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC)
+```
+
+ Unique rank (no ties)
+
+---
+
+## RANK()
+
+```sql
+RANK() OVER (ORDER BY salary DESC)
+```
+
+ Same rank for ties
+Skips numbers
+
+---
+
+## DENSE_RANK()
+
+```sql
+DENSE_RANK() OVER (ORDER BY salary DESC)
+```
+
+ Same rank for ties
+ No gaps
+
+---
+
+#  2.2 Value Functions
+
+## LAG()
+
+```sql
+LAG(salary, 1) OVER (ORDER BY salary)
+```
+
+ Previous row value
+
+---
+
+## LEAD()
+
+```sql
+LEAD(salary, 1) OVER (ORDER BY salary)
+```
+
+ Next row value
+
+---
+
+#  2.3 Distribution Function
+
+## NTILE()
+
+```sql
+NTILE(4) OVER (ORDER BY salary DESC)
+```
+
+ Divides rows into 4 buckets
+
+---
+
+#  4. ORDER BY in Window Functions
+
+## Definition
+
+Controls **row sequence inside partition**.
+
+```sql
+ROW_NUMBER() OVER (ORDER BY salary DESC)
+```
+
+ Required for ranking functions
+ Affects calculations heavily
+
+---
+
+#  5. Window Frame (FRAMING)
+
+## Definition
+
+Defines **which rows are considered for calculation**.
+
+---
+
+## Syntax
+
+```sql
+ROWS BETWEEN start AND end
+```
+
+---
+
+##  Common Frames
+
+### Full Partition
+
+```sql
+ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+```
+
+---
+
+### Running Window
+
+```sql
+ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+```
+
+---
+
+### Sliding Window
+
+```sql
+ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
+```
+
+---
+
+#  5. IMPORTANT: Default Frame Behavior (Most Confusing Topic)
+
+---
+
+## Key Concept
+
+When you write:
+
+```sql
+OVER (PARTITION BY department ORDER BY salary)
+```
+
+SQL **automatically assumes**:
+
+```sql
+RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+```
+
+ Even if you don’t write FRAME, it is **implicitly applied**
+
+---
+
+# Why it “sometimes works” without FRAME?
+
+---
+
+## Case 1: Functions where ORDER BY doesn’t matter much
+
+### Example: MAX(), MIN()
+
+```sql
+MAX(salary) OVER (PARTITION BY department)
+```
+
+ Full partition → correct max
+
+---
+
+```sql
+MAX(salary) OVER (PARTITION BY department ORDER BY salary)
+```
+
+ Becomes **running max**
+
+ Looks correct sometimes if:
+
+* Data is sorted
+* Max is last row
+
+---
+
+## Case 2: Functions that REQUIRE ORDER BY
+
+### Example: ROW_NUMBER(), RANK(), LAG()
+
+```sql
+ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary)
+```
+
+ ORDER BY mandatory
+ Frame doesn’t affect result
+
+ Always behaves correctly
+
+---
+
+## Case 3: Aggregate + ORDER BY (Confusing Zone)
+
+### Example:
+
+```sql
+SUM(salary) OVER (PARTITION BY department ORDER BY salary)
+```
+
+Not total sum
+ Running sum
+
+---
+
+# Why FRAME fixes everything
+
+When you explicitly define:
+
+```sql
+ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+```
+
+ You force SQL to use **entire partition**
+
+---
+
+###  Example (Correct Full Max)
+
+```sql
+SELECT name, department, salary,
+       MAX(salary) OVER (
+           PARTITION BY department
+           ORDER BY salary
+           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+       ) AS max_salary
+FROM employees;
+```
+
+ Always correct
+ No surprises
+
+---
+
+#  RANGE vs ROWS (Very Important)
+
+| Feature        | RANGE (Default)     | ROWS               |
+| -------------- | ------------------- | ------------------ |
+| Behavior       | Groups equal values | Row-by-row         |
+| Duplicates     | Treated together    | Treated separately |
+| Predictability | Less predictable    | More predictable   |
+
+---
+
+#  Final Rule (Must Remember)
+
+| Scenario                   | Result               |
+| -------------------------- | -------------------- |
+| No ORDER BY                | Full partition       |
+| ORDER BY only              | Running / cumulative |
+| ORDER BY + ROWS full frame | Full partition again |
+
+---
+
+#  6. Combined Example (All Concepts)
+
+```sql
+WITH emp_cte AS (
+    SELECT name, department, salary,
+           ROW_NUMBER() OVER (
+               PARTITION BY department
+               ORDER BY salary DESC
+           ) AS rn,
+           SUM(salary) OVER (
+               PARTITION BY department
+               ORDER BY salary
+           ) AS running_total
+    FROM employees
+)
+SELECT name, department, salary,
+       running_total,
+       CASE
+           WHEN rn = 1 THEN 'Top Performer'
+           ELSE 'Others'
+       END AS performance
+FROM emp_cte;
+```
+
+---
+
+##  Output Explanation
+
+* `ROW_NUMBER()` → ranking
+* `SUM()` → running total
+* `CASE` → categorization
+* `CTE` → structured query
+
+---
+
+# Interview Cheat Sheet
+
+* `ROW_NUMBER()` → Dedup / Top 1
+* `RANK()` → Top N with ties
+* `DENSE_RANK()` → Continuous ranking
+* `LAG/LEAD` → Previous/Next analysis
+* `NTILE()` → Percentiles
+* `ORDER BY` → Controls sequence
+* `FRAME` → Controls calculation scope  MOST IMPORTANT
+
+---
