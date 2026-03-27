@@ -1,0 +1,375 @@
+# 1. Stored Routines (Procedures & Functions)
+
+---
+
+## Definition
+
+> **Stored Routines** are pre-written SQL programs stored inside the database that can be executed whenever needed.
+
+There are two types:
+
+* **Stored Procedures** → perform actions (INSERT, UPDATE, etc.)
+* **Stored Functions** → return a value
+
+---
+
+## 1.1 Stored Procedure
+
+---
+
+### Explanation
+
+A **Stored Procedure** is a reusable block of SQL code used to perform operations like inserting, updating, or processing data.
+
+Think of it like a **function without return value (optional)**.
+
+---
+
+### Syntax
+
+```sql
+DELIMITER $$
+
+CREATE PROCEDURE procedure_name (IN param1 INT)
+BEGIN
+    -- SQL statements
+END $$
+
+DELIMITER ;
+```
+
+---
+
+### Syntax Explanation
+
+| Keyword          | Meaning                                        |
+| ---------------- | ---------------------------------------------- |
+| DELIMITER $$     | Changes delimiter to allow multiple statements |
+| CREATE PROCEDURE | Defines procedure                              |
+| procedure_name   | Name of procedure                              |
+| IN param1        | Input parameter                                |
+| BEGIN ... END    | Block of SQL code                              |
+
+---
+
+### Example
+
+```sql
+DELIMITER $$
+
+CREATE PROCEDURE get_orders_by_customer(IN cust_id INT)
+BEGIN
+    SELECT * 
+    FROM orders
+    WHERE customer_id = cust_id;
+END $$
+
+DELIMITER ;
+```
+
+---
+
+### Execution
+
+```sql
+CALL get_orders_by_customer(1);
+```
+
+---
+
+### Output Explanation
+
+Returns all orders where `customer_id = 1`.
+
+---
+
+---
+
+## 1.2 Stored Function
+
+---
+
+### Explanation
+
+A **Stored Function** returns a single value and can be used inside queries.
+
+Think of it like a **calculation function**.
+
+---
+
+### Syntax
+
+```sql
+DELIMITER $$
+
+CREATE FUNCTION function_name(param1 INT)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    RETURN param1 * 2;
+END $$
+
+DELIMITER ;
+```
+
+---
+
+### Syntax Explanation
+
+| Keyword         | Meaning                  |
+| --------------- | ------------------------ |
+| CREATE FUNCTION | Defines function         |
+| RETURNS INT     | Return data type         |
+| DETERMINISTIC   | Same input → same output |
+| RETURN          | Output value             |
+
+---
+
+### Example
+
+```sql
+DELIMITER $$
+
+CREATE FUNCTION calculate_discount(price INT)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    RETURN price - (price * 0.1);
+END $$
+
+DELIMITER ;
+```
+
+---
+
+### Usage
+
+```sql
+SELECT calculate_discount(1000);
+```
+
+---
+
+### Output Explanation
+
+Returns:
+
+```
+900
+```
+
+---
+
+## Common Mistakes
+
+* Forgetting `DELIMITER`
+* Not specifying `RETURNS` in functions
+* Using functions for heavy operations
+* Confusing procedure vs function
+
+---
+
+##  Key Difference
+
+| Feature        | Procedure  | Function     |
+| -------------- | ---------- | ------------ |
+| Returns value  | Optional   | Mandatory    |
+| Used in SELECT | No         | Yes          |
+| Purpose        | Operations | Calculations |
+
+---
+
+# 2. Triggers
+
+---
+
+## Definition
+
+> A **Trigger** is an automatic SQL action that executes when an event (INSERT, UPDATE, DELETE) occurs on a table.
+
+---
+
+## Explanation
+
+Think of it like:
+
+* If event happens → automatically run code
+
+Example:
+
+* Insert order → log it
+* Update price → track change
+
+---
+
+## Syntax
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER trigger_name
+BEFORE / AFTER INSERT / UPDATE / DELETE
+ON table_name
+FOR EACH ROW
+BEGIN
+    -- SQL statements
+END $$
+
+DELIMITER ;
+```
+
+---
+
+## Syntax Explanation
+
+| Keyword              | Meaning        |
+| -------------------- | -------------- |
+| CREATE TRIGGER       | Define trigger |
+| BEFORE / AFTER       | Timing         |
+| INSERT/UPDATE/DELETE | Event          |
+| ON table_name        | Target table   |
+| FOR EACH ROW         | Runs per row   |
+| NEW                  | New value      |
+| OLD                  | Old value      |
+
+---
+
+## 2.1 BEFORE Trigger Example (Validation)
+
+---
+
+### Example
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER before_insert_orders
+BEFORE INSERT ON orders
+FOR EACH ROW
+BEGIN
+    IF NEW.order_amount <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Amount must be positive';
+    END IF;
+END $$
+
+DELIMITER ;
+```
+
+---
+
+### Output Explanation
+
+* Prevents invalid data
+* Throws error if amount ≤ 0
+
+---
+
+## 2.2 AFTER Trigger Example (Logging)
+
+---
+
+### Example
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER after_insert_orders
+AFTER INSERT ON orders
+FOR EACH ROW
+BEGIN
+    INSERT INTO orders_log(order_id, log_message)
+    VALUES (
+        NEW.order_id,
+        CONCAT('Order ', NEW.order_id, ' created')
+    );
+END $$
+
+DELIMITER ;
+```
+
+---
+
+### Output Explanation
+
+* Automatically logs new orders
+* No manual query needed
+
+---
+
+## 2.3 UPDATE Trigger Example
+
+---
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER after_update_orders
+AFTER UPDATE ON orders
+FOR EACH ROW
+BEGIN
+    IF OLD.order_amount <> NEW.order_amount THEN
+        INSERT INTO orders_log(order_id, log_message)
+        VALUES (
+            NEW.order_id,
+            CONCAT('Updated from ', OLD.order_amount, ' to ', NEW.order_amount)
+        );
+    END IF;
+END $$
+
+DELIMITER ;
+```
+
+---
+
+## 2.4 DELETE Trigger Example
+
+---
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER after_delete_orders
+AFTER DELETE ON orders
+FOR EACH ROW
+BEGIN
+    INSERT INTO orders_log(order_id, log_message)
+    VALUES (
+        OLD.order_id,
+        CONCAT('Order ', OLD.order_id, ' deleted')
+    );
+END $$
+
+DELIMITER ;
+```
+
+---
+
+## Common Mistakes
+
+* Using `OLD` in INSERT trigger
+* Using `NEW` in DELETE trigger
+* Missing `FOR EACH ROW`
+* Infinite loops (updating same table)
+
+---
+
+## Important Notes
+
+* Runs automatically
+* Hard to debug
+* Can affect performance
+
+---
+
+## Summary
+
+| Concept          | Purpose               |
+| ---------------- | --------------------- |
+| Stored Procedure | Perform tasks         |
+| Stored Function  | Return value          |
+| Trigger          | Auto action on events |
+
+---
+
+
