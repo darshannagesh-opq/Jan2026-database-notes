@@ -1,0 +1,246 @@
+# SQL Notes: Transactions + Normalization
+
+---
+
+# 1. SQL Transactions
+
+## Definition
+
+A **transaction** is a group of SQL operations executed as a single unit.
+Either **all operations succeed (COMMIT)** or **none are applied (ROLLBACK)**.
+
+Think of it like a **bank transfer** — money should be debited and credited together.
+
+
+## Syntax
+
+```sql
+START TRANSACTION;
+
+-- SQL queries
+UPDATE accounts 
+SET balance = balance - 500 
+WHERE id = 1;
+
+UPDATE accounts 
+SET balance = balance + 500 
+WHERE id = 2;
+
+COMMIT;
+```
+
+---
+
+## Syntax Explanation
+
+* `START TRANSACTION` → Begins a transaction block
+* `UPDATE` → Modifies data
+* `COMMIT` → Saves all changes permanently
+* `ROLLBACK` → Cancels all changes if something goes wrong
+
+---
+
+## Practical Example
+
+### Table: `accounts`
+
+| id | name  | balance |
+| -- | ----- | ------- |
+| 1  | Alice | 5000    |
+| 2  | Bob   | 3000    |
+
+### Query:
+
+```sql
+START TRANSACTION;
+
+UPDATE accounts 
+SET balance = balance - 1000 
+WHERE id = 1;
+
+UPDATE accounts 
+SET balance = balance + 1000 
+WHERE id = 2;
+
+COMMIT;
+```
+
+---
+
+## Output Explanation
+
+* Alice → 5000 → 4000
+* Bob → 3000 → 4000
+  ✔ Transfer successful
+
+If any query fails → use:
+
+```sql
+ROLLBACK;
+```
+
+Everything returns to original values.
+
+---
+
+## Common Mistakes
+
+* Forgetting `COMMIT` → changes not saved
+* Using transactions for simple SELECT queries
+* Not handling errors → partial updates
+
+---
+
+## Quick Exercise
+
+What happens if the second update fails before `COMMIT`?
+Answer: Use `ROLLBACK` → no changes applied
+
+---
+
+# 2. Database Normalization
+
+## Definition
+
+**Normalization** is the process of organizing data to reduce redundancy and improve consistency.
+
+Goal: **Avoid duplicate data & anomalies**
+
+---
+
+## Why Normalization?
+
+* Prevent duplicate data
+* Avoid update/delete issues
+* Improve data integrity
+
+---
+
+## Types of Normalization
+
+### First Normal Form (1NF)
+
+* No repeating groups
+* Each column has atomic (single) values
+
+---
+
+### Second Normal Form (2NF)
+
+* Must be in 1NF
+* No partial dependency (data depends on full primary key)
+
+---
+
+### Third Normal Form (3NF)
+
+* Must be in 2NF
+* No transitive dependency (no indirect dependency)
+
+---
+
+## Example (Before Normalization)
+
+### Table: `orders`
+
+| order_id | customer_name | product | price |
+| -------- | ------------- | ------- | ----- |
+| 1        | Alice         | Laptop  | 50000 |
+| 2        | Alice         | Mouse   | 500   |
+
+Problems:
+
+* Customer name repeated
+* Data redundancy
+
+---
+
+## After Normalization
+
+### Table 1: `customers`
+
+| customer_id | name  |
+| ----------- | ----- |
+| 1           | Alice |
+
+---
+
+### Table 2: `orders`
+
+| order_id | customer_id |
+| -------- | ----------- |
+| 1        | 1           |
+| 2        | 1           |
+
+---
+
+### Table 3: `products`
+
+| product_id | name   | price |
+| ---------- | ------ | ----- |
+| 1          | Laptop | 50000 |
+| 2          | Mouse  | 500   |
+
+---
+
+## Sample Query
+
+```sql
+SELECT 
+    o.order_id,
+    c.name AS customer_name,
+    p.name AS product_name,
+    p.price
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN products p ON o.product_id = p.product_id;
+```
+
+---
+
+## Syntax Explanation
+
+* `SELECT` → Fetch data
+* `JOIN` → Combine tables
+* `ON` → Condition for joining tables
+* `AS` → Rename column
+
+---
+
+## Output Explanation
+
+| order_id | customer_name | product_name | price |
+| -------- | ------------- | ------------ | ----- |
+| 1        | Alice         | Laptop       | 50000 |
+| 2        | Alice         | Mouse        | 500   |
+
+✔ No duplication
+✔ Clean structure
+
+---
+
+## Common Mistakes
+
+* Over-normalizing → too many joins
+* Not defining proper primary keys
+* Ignoring performance
+
+---
+
+## Quick Exercise
+
+Convert this into 2NF:
+
+| student_id | course | instructor |
+| ---------- | ------ | ---------- |
+
+Hint: Separate course details into another table
+
+---
+
+#  Final Summary
+
+| Topic         | Key Idea                                  |
+| ------------- | ----------------------------------------- |
+| Transactions  | Ensure safe execution of multiple queries |
+| Normalization | Remove redundancy & organize data         |
