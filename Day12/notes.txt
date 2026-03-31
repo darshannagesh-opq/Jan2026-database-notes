@@ -1,0 +1,327 @@
+# **1. Indexing**
+
+## **Definition**
+
+Indexing is a technique used to **speed up data retrieval** in a database by creating a quick lookup structure.
+
+## **Explanation**
+
+Without an index, the database scans every row (**full table scan**).
+With an index, it can directly jump to the required data — like using an index in a book.
+
+---
+
+## **Syntax**
+
+```sql
+CREATE INDEX index_name
+ON table_name (column_name);
+```
+
+---
+
+## **Syntax Breakdown**
+
+* `CREATE INDEX` → Command to create an index
+* `index_name` → Name of the index
+* `ON table_name` → Table where index is applied
+* `(column_name)` → Column used for faster searching
+
+---
+
+## **Example**
+
+```sql
+CREATE INDEX idx_email
+ON users (email);
+```
+
+### **What it does**
+
+* Speeds up queries like:
+
+```sql
+SELECT * FROM users WHERE email = 'test@gmail.com';
+```
+
+---
+
+## **Output Explanation**
+
+* No visible output
+* Query execution becomes **faster**, especially for large tables
+
+---
+
+# **2. B-Tree (Binary Tree Index Structure)**
+
+## **Definition**
+
+A **B-Tree** is a self-balanced tree data structure used by databases to store indexes efficiently.
+
+## **Explanation**
+
+* Most databases (like MySQL, PostgreSQL) use **B-Tree for indexing**
+* It keeps data **sorted**
+* Enables fast operations:
+
+  * Search → O(log n)
+  * Insert → O(log n)
+  * Delete → O(log n)
+
+---
+
+## **Conceptual Structure**
+
+```
+        [50]
+       /    \
+   [20,30]  [70,90]
+```
+
+---
+
+## **Syntax**
+
+(No direct SQL syntax — used internally by DB)
+
+```sql
+CREATE INDEX idx_name
+ON table_name (column_name);
+```
+
+(Default index type = B-Tree in most databases)
+
+---
+
+## **Syntax Explanation**
+
+* When you create an index → DB internally uses B-Tree
+* You don’t need to manually define it (usually)
+
+---
+
+## **Example**
+
+```sql
+CREATE INDEX idx_salary
+ON employees (salary);
+```
+
+---
+
+## **Output Explanation**
+
+* Database stores values in sorted tree structure
+* Searching `WHERE salary = 50000` becomes very fast
+
+---
+
+# **3. ACID Properties**
+
+## **Definition**
+
+ACID ensures **reliable and safe transactions** in a database.
+
+## **Explanation**
+
+ACID stands for:
+
+* **A** → Atomicity
+* **C** → Consistency
+* **I** → Isolation
+* **D** → Durability
+
+---
+
+## **Key Concepts**
+
+* **Atomicity** → All operations succeed or none
+* **Consistency** → Data remains valid
+* **Isolation** → Transactions don’t interfere
+* **Durability** → Data is saved permanently
+
+---
+
+## **Syntax (Transaction Example)**
+
+```sql
+START TRANSACTION;
+
+UPDATE accounts
+SET balance = balance - 100
+WHERE id = 1;
+
+UPDATE accounts
+SET balance = balance + 100
+WHERE id = 2;
+
+COMMIT;
+```
+
+---
+
+## **Syntax Breakdown**
+
+* `START TRANSACTION` → Begin transaction
+* `UPDATE` → Modify data
+* `COMMIT` → Save changes permanently
+* (or `ROLLBACK` → Undo changes)
+
+---
+
+## **Example Scenario**
+
+Bank transfer:
+
+* Deduct from A
+* Add to B
+
+---
+
+## **Output Explanation**
+
+* If any step fails → entire transaction is rolled back
+* Ensures **no data corruption**
+
+---
+
+# **4. CAP Theorem**
+
+## **Definition**
+
+CAP theorem states that a distributed database can provide only **2 out of 3 guarantees**.
+
+## **Explanation**
+
+CAP stands for:
+
+* **C → Consistency** (same data everywhere)
+* **A → Availability** (system always responds)
+* **P → Partition Tolerance** (works despite network failures)
+
+---
+
+## **Key Rule**
+
+You can only choose **2 out of 3**
+
+---
+
+## **Types of Systems**
+
+* **CP** → Consistency + Partition (e.g., HBase)
+* **AP** → Availability + Partition (e.g., Cassandra)
+* **CA** → Consistency + Availability (rare, no partition)
+
+---
+
+## **SQL Relevance**
+
+* Traditional SQL DBs (like MySQL) focus on:
+  → **CA (Consistency + Availability)**
+
+---
+
+## **Example Scenario**
+
+If network breaks:
+
+* Choose consistency → system may stop (CP)
+* Choose availability → may return outdated data (AP)
+
+---
+
+# **5. OLTP vs OLAP**
+
+## **Definition**
+
+These are two types of database systems based on usage.
+
+---
+
+## **OLTP (Online Transaction Processing)**
+
+### **Explanation**
+
+* Handles **real-time transactions**
+* Used in:
+
+  * Banking
+  * E-commerce
+  * Order systems
+
+---
+
+### **Characteristics**
+
+* Fast inserts/updates
+* Many small queries
+* Highly normalized data
+
+---
+
+### **Example Query**
+
+```sql
+INSERT INTO orders (user_id, amount)
+VALUES (101, 500);
+```
+
+---
+
+## **OLAP (Online Analytical Processing)**
+
+### **Explanation**
+
+* Used for **data analysis and reporting**
+* Works on large datasets
+
+---
+
+### **Characteristics**
+
+* Complex queries
+* Aggregations (SUM, AVG)
+* Historical data
+* Denormalized data
+
+---
+
+### **Example Query**
+
+```sql
+SELECT region, SUM(sales)
+FROM sales_data
+GROUP BY region;
+```
+
+---
+
+## **Key Differences**
+
+| Feature | OLTP         | OLAP                   |
+| ------- | ------------ | ---------------------- |
+| Purpose | Transactions | Analysis               |
+| Queries | Simple       | Complex                |
+| Speed   | Very fast    | Slower (heavy queries) |
+| Data    | Current      | Historical             |
+| Example | ATM, Orders  | Reports, BI dashboards |
+
+---
+
+## **Output Explanation**
+
+* OLTP → Immediate result (transaction success)
+* OLAP → Insights (totals, trends, reports)
+
+---
+
+# **Final Quick Summary**
+
+* **Indexing** → Makes queries fast
+* **B-Tree** → Structure behind indexes
+* **ACID** → Ensures safe transactions
+* **CAP** → Trade-off in distributed systems
+* **OLTP vs OLAP** → Transaction vs Analytics systems
+
